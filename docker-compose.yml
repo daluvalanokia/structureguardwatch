@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__Default=Server=db;Database=StructureWatch;User Id=sa;Password=Str0ngP@ssw0rd!;TrustServerCertificate=True
+      - TokenSaver__AgentAppId=6a9300eb4848d8d50e439566
+      - TokenSaver__BaseUrl=https://app.base44.com
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Str0ngP@ssw0rd!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$$SA_PASSWORD" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sqldata:

@@ -1,0 +1,123 @@
+/* structurewatch.css — Real-Map Mode styles */
+
+#map {
+    background: #1a1a2e;
+    z-index: 0;
+}
+
+.leaflet-container {
+    background: #1a1a2e;
+    font-family: inherit;
+}
+
+.leaflet-control-zoom a {
+    background: #1f2937 !important;
+    color: #d1d5db !important;
+    border-color: #374151 !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+.leaflet-tooltip {
+    background: #111827;
+    border: 1px solid #374151;
+    color: #f3f4f6;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+}
+
+.leaflet-popup-content-wrapper {
+    background: #111827;
+    color: #f3f4f6;
+    border: 1px solid #374151;
+    border-radius: 8px;
+}
+
+.leaflet-popup-tip {
+    background: #111827;
+}
+
+/* ─── Scrollbars ──────────────────────────────────────────── */
+#inspector::-webkit-scrollbar,
+#collisionPanel::-webkit-scrollbar,
+#searchDropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+#inspector::-webkit-scrollbar-track,
+#collisionPanel::-webkit-scrollbar-track,
+#searchDropdown::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+#inspector::-webkit-scrollbar-thumb,
+#collisionPanel::-webkit-scrollbar-thumb,
+#searchDropdown::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 3px;
+}
+
+/* ─── Search Dropdown ──────────────────────────────────────── */
+#searchDropdown {
+    backdrop-filter: blur(8px);
+}
+
+.search-result {
+    transition: background 150ms ease;
+}
+
+.search-result:hover {
+    background: rgba(20, 184, 166, 0.15);
+}
+
+/* ─── Scan Radar Animation ────────────────────────────────── */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+.scan-radar {
+    animation: radar-pulse 2s ease-out infinite;
+}
+
+@keyframes radar-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.4),
+                    0 0 0 0 rgba(20, 184, 166, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 60px rgba(20, 184, 166, 0),
+                    0 0 0 120px rgba(20, 184, 166, 0);
+    }
+}
+
+.scan-sweep {
+    background: conic-gradient(
+        from 0deg,
+        rgba(20, 184, 166, 0) 0deg,
+        rgba(20, 184, 166, 0) 270deg,
+        rgba(20, 184, 166, 0.4) 350deg,
+        rgba(20, 184, 166, 0.6) 360deg
+    );
+    animation: spin 1.5s linear infinite;
+    mask: radial-gradient(circle, transparent 0%, black 100%);
+    -webkit-mask: radial-gradient(circle, transparent 0%, black 100%);
+}
+
+/* ─── Drag Mode Cursor ────────────────────────────────────── */
+.drag-mode-active .leaflet-container {
+    cursor: crosshair !important;
+}
+
+/* ─── Search Input Loading ─────────────────────────────────── */
+#searchBox.loading {
+    opacity: 0.7;
+}

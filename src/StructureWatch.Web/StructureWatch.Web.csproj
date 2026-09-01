@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\StructureWatch.Core\StructureWatch.Core.csproj" />
+    <ProjectReference Include="..\StructureWatch.Data\StructureWatch.Data.csproj" />
+    <ProjectReference Include="..\StructureWatch.Agents\StructureWatch.Agents.csproj" />
+  </ItemGroup>
+</Project>

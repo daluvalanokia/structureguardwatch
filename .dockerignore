@@ -1,0 +1,14 @@
+# .dockerignore — reduce Docker build context
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+.git/
+.gitignore
+tests/
+*.md
+*.log
+appsettings.Development.json
