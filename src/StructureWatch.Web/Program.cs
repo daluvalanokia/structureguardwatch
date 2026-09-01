@@ -7,17 +7,17 @@ using StructureWatch.Agents;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC
+// MVC + Razor Views
 builder.Services.AddControllersWithViews();
 
-// EF Core
+// EF Core — LocalDB for localhost dev
 builder.Services.AddDbContext<StructureWatchDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-// Memory cache
+// Memory cache (for Overpass footprint caching)
 builder.Services.AddMemoryCache();
 
-// Overpass service — HttpClient with Polly retry + rate limiting
+// Overpass service — HttpClient with Polly retry
 builder.Services.AddHttpClient<IOverpassService, OverpassService>()
     .AddTransientHttpErrorHandler(p => p.WaitAndRetryAsync(3, attempt =>
         TimeSpan.FromSeconds(Math.Pow(2, attempt))));
@@ -45,14 +45,22 @@ builder.Services.AddHttpClient<ITokenSaverAgent, TokenSaverAgent>((sp, client) =
 
 var app = builder.Build();
 
-// Auto-migrate on startup
+// Create database on startup (no migrations needed — schema auto-generated)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<StructureWatchDbContext>();
-    db.Database.Migrate();
+    db.Database.EnsureCreated();
 }
 
+// Static files (wwwroot — JS, CSS, Leaflet)
 app.UseStaticFiles();
+
+// Routing
 app.UseRouting();
-app.MapControllers();
+
+// Default route: /Map/Index
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Map}/{action=Index}/{id?}");
+
 app.Run();

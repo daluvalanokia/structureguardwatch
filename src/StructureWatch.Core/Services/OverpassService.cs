@@ -1,6 +1,7 @@
 // StructureWatch.Core/Services/OverpassService.cs
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using System.Threading.RateLimiting;
 using StructureWatch.Core.Models;
 using StructureWatch.Core.Extensions;
@@ -11,23 +12,17 @@ public class OverpassService : IOverpassService
 {
     private readonly HttpClient _http;
     private readonly IMemoryCache _cache;
-    private readonly RateLimiter _limiter;
     private readonly TimeSpan _cacheTtl;
+    private readonly SemaphoreSlim _rateGate;
+    private readonly int _minIntervalMs;
 
-    public OverpassService(HttpClient http, IMemoryCache cache, TimeSpan cacheTtl, TimeSpan minInterval)
+    public OverpassService(HttpClient http, IMemoryCache cache, IConfiguration config)
     {
         _http = http;
         _cache = cache;
-        _cacheTtl = cacheTtl;
-        _limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions
-        {
-            TokenLimit = 1,
-            TokensPerPeriod = 1,
-            ReplenishmentPeriod = minInterval,
-            QueueLimit = 10,
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-            AutoReplenishment = true
-        });
+        _cacheTtl = TimeSpan.FromMinutes(config.GetValue("Overpass:CacheTtlMinutes", 5));
+        _minIntervalMs = config.GetValue("Overpass:MinIntervalMs", 2000);
+        _rateGate = new SemaphoreSlim(1, 1);
     }
 
     public async Task<List<BuildingFootprint>> FetchFootprintsAsync(double s, double w, double n, double e)
@@ -36,30 +31,40 @@ public class OverpassService : IOverpassService
         if (_cache.TryGetValue(cacheKey, out List<BuildingFootprint>? cached) && cached is not null)
             return cached;
 
-        await _limiter.AcquireAsync();
-
-        string query = $$"""
-            [out:json][timeout:25];
-            (
-              way["building"]({{s}},{{w}},{{n}},{{e}});
-              relation["building"]({{s}},{{w}},{{n}},{{e}});
-            );
-            out geom;
-            """;
-
-        var content = new FormUrlEncodedContent(new[]
+        // Simple rate limiting — wait for previous request to complete its interval
+        await _rateGate.WaitAsync();
+        try
         {
-            new KeyValuePair<string, string>("data", query)
-        });
+            // Ensure minimum interval between requests
+            await Task.Delay(_minIntervalMs);
 
-        var resp = await _http.PostAsync("https://overpass-api.de/api/interpreter", content);
-        resp.EnsureSuccessStatusCode();
+            string query = $$"""
+                [out:json][timeout:25];
+                (
+                  way["building"]({{s}},{{w}},{{n}},{{e}});
+                  relation["building"]({{s}},{{w}},{{n}},{{e}});
+                );
+                out geom;
+                """;
 
-        var json = await resp.Content.ReadFromJsonAsync<JsonDocument>();
-        var buildings = ParseOverpassResponse(json!);
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("data", query)
+            });
 
-        _cache.Set(cacheKey, buildings, _cacheTtl);
-        return buildings;
+            var resp = await _http.PostAsync("https://overpass-api.de/api/interpreter", content);
+            resp.EnsureSuccessStatusCode();
+
+            var json = await resp.Content.ReadFromJsonAsync<JsonDocument>();
+            var buildings = ParseOverpassResponse(json!);
+
+            _cache.Set(cacheKey, buildings, _cacheTtl);
+            return buildings;
+        }
+        finally
+        {
+            _rateGate.Release();
+        }
     }
 
     private static List<BuildingFootprint> ParseOverpassResponse(JsonDocument doc)

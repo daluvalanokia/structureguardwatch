@@ -8,14 +8,6 @@ namespace StructureWatch.Core.Services;
 /// In the .NET solution this drives the scan state server-side; the frontend
 /// mirrors it with the radar CSS animation.
 /// </summary>
-public interface IScanService
-{
-    ScanState StartScan(string locationName, double lat, double lng, int zoom = 16);
-    ScanState CompleteScan(int buildingCount);
-    ScanState FailScan(string error);
-    ScanState GetCurrentScan();
-}
-
 public class ScanService : IScanService
 {
     private ScanState _current = new();

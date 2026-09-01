@@ -6,6 +6,11 @@
     <LangVersion>12</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.8" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\StructureWatch.Core\StructureWatch.Core.csproj" />
     <ProjectReference Include="..\StructureWatch.Data\StructureWatch.Data.csproj" />
     <ProjectReference Include="..\StructureWatch.Agents\StructureWatch.Agents.csproj" />
