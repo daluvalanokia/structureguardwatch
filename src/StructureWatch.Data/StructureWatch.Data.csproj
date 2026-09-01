@@ -11,8 +11,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!-- Optional: uncomment for PostgreSQL -->
-    <!-- <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" /> -->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StructureWatch.Core\StructureWatch.Core.csproj" />
