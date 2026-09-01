@@ -1,3 +1,4 @@
+using Xunit;
 using StructureWatch.Core.Models;
 using StructureWatch.Core.Services;
 

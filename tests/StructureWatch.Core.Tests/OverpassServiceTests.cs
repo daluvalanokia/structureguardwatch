@@ -1,6 +1,6 @@
+using Xunit;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
-using Moq;
 using StructureWatch.Core.Services;
 
 namespace StructureWatch.Core.Tests;
@@ -13,7 +13,14 @@ public class OverpassServiceTests
         // Arrange
         var http = new HttpClient { BaseAddress = new Uri("https://overpass-api.de") };
         var cache = new MemoryCache(new MemoryCacheOptions());
-        var service = new OverpassService(http, cache, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(2));
+        var config = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Overpass:CacheTtlMinutes"] = "5",
+                ["Overpass:MinIntervalMs"] = "2000"
+            })
+            .Build();
+        var service = new OverpassService(http, cache, config);
 
         // Manhattan bbox
         double s = 40.7550, w = -73.9900, n = 40.7620, e = -73.9800;

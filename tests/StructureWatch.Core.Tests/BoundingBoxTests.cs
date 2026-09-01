@@ -1,3 +1,4 @@
+using Xunit;
 using StructureWatch.Core.Models;
 
 namespace StructureWatch.Core.Tests;

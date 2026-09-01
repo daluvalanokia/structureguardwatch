@@ -1,6 +1,8 @@
+using Xunit;
 using Microsoft.AspNetCore.Mvc;
 using StructureWatch.Web.Controllers;
 using StructureWatch.Core.Services;
+using StructureWatch.Core.Models;
 using Moq;
 
 namespace StructureWatch.Web.Tests;

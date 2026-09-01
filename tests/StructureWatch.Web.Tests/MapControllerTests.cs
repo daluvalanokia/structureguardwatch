@@ -1,4 +1,6 @@
+using Xunit;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using StructureWatch.Web.Controllers;
 using StructureWatch.Core.Services;
 using Moq;

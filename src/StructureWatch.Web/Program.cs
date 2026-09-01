@@ -1,4 +1,3 @@
-// StructureWatch.Web/Program.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using StructureWatch.Core.Services;
@@ -17,10 +16,8 @@ builder.Services.AddDbContext<StructureWatchDbContext>(options =>
 // Memory cache (for Overpass footprint caching)
 builder.Services.AddMemoryCache();
 
-// Overpass service — HttpClient with Polly retry
-builder.Services.AddHttpClient<IOverpassService, OverpassService>()
-    .AddTransientHttpErrorHandler(p => p.WaitAndRetryAsync(3, attempt =>
-        TimeSpan.FromSeconds(Math.Pow(2, attempt))));
+// Overpass service — HttpClient (rate limiting handled in-service via SemaphoreSlim)
+builder.Services.AddHttpClient<IOverpassService, OverpassService>();
 
 // Nominatim address search service
 builder.Services.AddHttpClient<INominatimService, NominatimService>((sp, client) =>
