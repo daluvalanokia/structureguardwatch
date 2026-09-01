@@ -1,5 +1,7 @@
 // StructureWatch.Core/Services/NominatimService.cs
 using System.Text.Json;
+using System.Net.Http.Json;
+using Microsoft.Extensions.Logging;
 using StructureWatch.Core.Models;
 
 namespace StructureWatch.Core.Services;
