@@ -1,0 +1,24 @@
+{
+  "name": "StructureWatch .NET 8",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-8.0",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  },
+  "forwardPorts": [5000, 5001],
+  "postCreateCommand": "dotnet restore StructureWatch.sln",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.vscode-dotnet-runtime"
+      ]
+    }
+  },
+  "portsAttributes": {
+    "5000": { "label": "HTTP", "onAutoForward": "openBrowser" },
+    "5001": { "label": "HTTPS", "onAutoForward": "openBrowser" }
+    }
+  }
+}
