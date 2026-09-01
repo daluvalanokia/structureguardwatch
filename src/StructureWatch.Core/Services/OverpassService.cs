@@ -1,5 +1,6 @@
 // StructureWatch.Core/Services/OverpassService.cs
 using System.Text.Json;
+using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using StructureWatch.Core.Models;
