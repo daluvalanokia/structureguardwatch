@@ -42,11 +42,25 @@ builder.Services.AddHttpClient<ITokenSaverAgent, TokenSaverAgent>((sp, client) =
 
 var app = builder.Build();
 
-// Create database on startup (no migrations needed — schema auto-generated)
+// Create database on startup (no migrations needed — schema auto-generated).
+// Wrapped in try/catch: a LocalDB/connection failure here must NEVER take down
+// the whole web server — it should log and let the app start so map/search/etc.
+// (which don't need the DB) keep working, and so the real error is visible
+// instead of "web server is no longer running".
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<StructureWatchDbContext>();
-    db.Database.EnsureCreated();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<StructureWatchDbContext>();
+        db.Database.EnsureCreated();
+        logger.LogInformation("Database ready.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Database initialization failed — app will continue running without DB persistence. " +
+            "Check that SQL Server LocalDB is installed and the connection string in appsettings.json is correct.");
+    }
 }
 
 // Static files (wwwroot — JS, CSS, Leaflet)
